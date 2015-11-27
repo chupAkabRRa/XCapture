@@ -41,6 +41,7 @@ protected:
     static DWORD WINAPI ThreadedTimer(LPVOID lpParam);
     HANDLE hTimerThread;
     DWORD dwTimerThreadId;
+    CWnd* label;
 
 public:
     afx_msg void OnDestroy();

@@ -74,6 +74,7 @@ BOOL CXCaptureDlg::OnInitDialog()
     captureRect.bottom = 768;
 
     hInstance = AfxGetInstanceHandle();
+    label = GetDlgItem(IDC_FPS);
 
     capturer = std::make_shared<ScreenCapturerMagnifier>();
     capturer->Start(this);
@@ -200,7 +201,6 @@ void CXCaptureDlg::OnTimer(UINT_PTR nIDEvent)
 {
     // TODO: Add your message handler code here and/or call default
     if (nIDEvent == 100) {
-        CWnd *label = GetDlgItem(IDC_FPS);
         WCHAR str[5];
         swprintf_s(str, 3, L"%d", dwFps);
         label->SetWindowTextW(str);
