@@ -50,6 +50,7 @@ BOOL CXCaptureDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
     capturer = NULL;
+    dwFps = 0;
 
     // Get scr resolution
     RECT rect;
@@ -59,8 +60,8 @@ BOOL CXCaptureDlg::OnInitDialog()
     // Set capture reginon
     captureRect.top = 0;
     captureRect.left = 0;
-    captureRect.right = 640;
-    captureRect.bottom = 480;
+    captureRect.right = 1024;
+    captureRect.bottom = 768;
 
     hInstance = AfxGetInstanceHandle();
 
@@ -68,6 +69,7 @@ BOOL CXCaptureDlg::OnInitDialog()
     capturer->Start(this);
 
     SetTimer(100, 30, NULL);
+    SetTimer(101, 1000, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -125,7 +127,9 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
     BitBlt(*pDC, 0, 0, bmi.bmiHeader.biWidth, bmi.bmiHeader.biHeight, hdcMem, 0, 0, SRCCOPY);
     SelectObject(hdcMem, hbmOld);
     DeleteDC(hdcMem);
-    ReleaseDC(pDC); 
+    ReleaseDC(pDC);
+    
+    dwFps++;
 }
 
 void CXCaptureDlg::OnDestroy()
@@ -184,6 +188,13 @@ void CXCaptureDlg::OnTimer(UINT_PTR nIDEvent)
     // TODO: Add your message handler code here and/or call default
     if (nIDEvent == 100) {
         capturer->Capture(captureRect);
+    } else if (nIDEvent == 101) {
+        CWnd *label = GetDlgItem(IDC_FPS);
+        WCHAR str[5];
+        swprintf_s(str, 3, L"%d", dwFps);
+        label->SetWindowTextW(str);
+        UpdateData(FALSE);
+        dwFps = 0;
     }
 
     __super::OnTimer(nIDEvent);

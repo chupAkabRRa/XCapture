@@ -6,7 +6,6 @@
 
 #include "ScreenCapturer.h"
 #include <memory>
-#include <thread>
 
 // CXCaptureDlg dialog
 class CXCaptureDlg : public CDialogEx, public ScreenCapturer::Callback
@@ -37,8 +36,8 @@ protected:
     HINSTANCE hInstance;
     std::shared_ptr<ScreenCapturer> capturer;
     RECT captureRect;
+    DWORD dwFps;
     void SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName);
-    std::thread tr;
 
 public:
     afx_msg void OnDestroy();
