@@ -15,7 +15,7 @@ public:
     // ScreenCapturer interface
     void Start(Callback *callback) override;
     void Capture(RECT srcRect) override;
-    void SetExcludedWindow() override;
+    void SetExcludedWindow(HWND hWindow) override;
 
 private:
     typedef BOOL(WINAPI* MagImageScalingCallback)(HWND hwnd, 
@@ -59,8 +59,6 @@ private:
 
     // Callback to call when image is received from Magnification API
     Callback   *m_Callback;
-    // Window to hide from capturing
-    HWND        m_hExcludedWindow;
 
     // Import from Magnification lib
     HMODULE                         m_hMagLib;
@@ -76,6 +74,9 @@ private:
     HWND m_hMagnifierControlWindow;
     // App instance
     HINSTANCE m_hInst;
+    // Window to exclude
+    // (May be changed to list of excluded windows in future)
+    HWND m_hExcludedWindow;
 
     bool m_bCaptureSucceeded;
 

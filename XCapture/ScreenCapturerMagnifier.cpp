@@ -150,8 +150,14 @@ bool ScreenCapturerMagnifier::InitializeMagnifier()
         return false;
     }
 
-    // TODO
     // Don't forget to try to exclude window here
+    if (m_hExcludedWindow) {
+        bResult = m_MagSetWindowFilterListFunc(m_hMagnifierControlWindow, MW_FILTERMODE_EXCLUDE, 1, &m_hExcludedWindow);
+        if (!bResult) {
+            TRACE(L"Failed to exclude requested window: 0x%x\n", GetLastError());
+            return false;
+        }
+    }
 
     if (m_dwTlsIdx == TLS_OUT_OF_INDEXES) {
         m_dwTlsIdx = TlsAlloc();
@@ -253,7 +259,10 @@ bool ScreenCapturerMagnifier::CaptureImage(RECT srcRect)
     return m_bCaptureSucceeded;
 }
 
-void ScreenCapturerMagnifier::SetExcludedWindow()
+void ScreenCapturerMagnifier::SetExcludedWindow(HWND hWindow)
 {
-    return;
+    m_hExcludedWindow = (HWND)hWindow;
+    if (m_hExcludedWindow && m_bMagInitialized) {
+        m_MagSetWindowFilterListFunc(m_hMagnifierControlWindow, MW_FILTERMODE_EXCLUDE, 1, &m_hExcludedWindow);
+    }
 }

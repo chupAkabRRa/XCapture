@@ -19,5 +19,5 @@ public:
 
     virtual void Capture(RECT srcRect) = 0;
 
-    virtual void SetExcludedWindow() {}
+    virtual void SetExcludedWindow(HWND hWindow) {}
 };

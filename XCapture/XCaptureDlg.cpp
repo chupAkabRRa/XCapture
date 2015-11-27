@@ -140,6 +140,7 @@ void CXCaptureDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
     // Get the screen rectangle
+    capturer->SetExcludedWindow(this->GetSafeHwnd());
 }
 
 void CXCaptureDlg::SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName)
