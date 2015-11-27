@@ -67,7 +67,7 @@ BOOL CXCaptureDlg::OnInitDialog()
     capturer = std::make_shared<ScreenCapturerMagnifier>();
     capturer->Start(this);
 
-    SetTimer(100, 100, NULL);
+    SetTimer(100, 30, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -140,8 +140,6 @@ void CXCaptureDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
     // Get the screen rectangle
-
-    capturer->Capture(captureRect);
 }
 
 void CXCaptureDlg::SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName)
