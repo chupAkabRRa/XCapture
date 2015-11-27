@@ -12,6 +12,15 @@
 #define new DEBUG_NEW
 #endif
 
+DWORD WINAPI CXCaptureDlg::ThreadedTimer(LPVOID lpParam)
+{
+    CXCaptureDlg* captureDlg = (CXCaptureDlg*)lpParam;
+
+    while (TRUE)
+    {
+        captureDlg->capturer->Capture(captureDlg->captureRect);
+    }
+}
 
 // CXCaptureDlg dialog
 
@@ -51,6 +60,7 @@ BOOL CXCaptureDlg::OnInitDialog()
 	// TODO: Add extra initialization here
     capturer = NULL;
     dwFps = 0;
+    hTimerThread = NULL;
 
     // Get scr resolution
     RECT rect;
@@ -68,8 +78,8 @@ BOOL CXCaptureDlg::OnInitDialog()
     capturer = std::make_shared<ScreenCapturerMagnifier>();
     capturer->Start(this);
 
-    SetTimer(100, 30, NULL);
-    SetTimer(101, 1000, NULL);
+    hTimerThread = CreateThread(NULL, 0, ThreadedTimer, this, 0, &dwTimerThreadId);
+    SetTimer(100, 1000, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -137,6 +147,9 @@ void CXCaptureDlg::OnDestroy()
     __super::OnDestroy();
 
     // TODO: Add your message handler code here
+    if (hTimerThread) {
+        CloseHandle(hTimerThread);
+    }
 }
 
 
@@ -187,8 +200,6 @@ void CXCaptureDlg::OnTimer(UINT_PTR nIDEvent)
 {
     // TODO: Add your message handler code here and/or call default
     if (nIDEvent == 100) {
-        capturer->Capture(captureRect);
-    } else if (nIDEvent == 101) {
         CWnd *label = GetDlgItem(IDC_FPS);
         WCHAR str[5];
         swprintf_s(str, 3, L"%d", dwFps);

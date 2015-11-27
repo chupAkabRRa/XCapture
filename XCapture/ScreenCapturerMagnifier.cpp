@@ -6,7 +6,7 @@ static LPCTSTR kHostWindowName = L"MagnifierHost";
 static LPCTSTR kMagnifierWindowClass = L"Magnifier";
 static LPCTSTR kMagnifierWindowName = L"MagnifierWindow";
 
-DWORD ScreenCapturerMagnifier::m_dwTlsIdx = TLS_OUT_OF_INDEXES;
+static ScreenCapturerMagnifier* g_Owner;
 
 ScreenCapturerMagnifier::ScreenCapturerMagnifier()
     : m_Callback(NULL)
@@ -159,11 +159,7 @@ bool ScreenCapturerMagnifier::InitializeMagnifier()
         }
     }
 
-    if (m_dwTlsIdx == TLS_OUT_OF_INDEXES) {
-        m_dwTlsIdx = TlsAlloc();
-    }
-
-    TlsSetValue(m_dwTlsIdx, this);
+    g_Owner = this;
 
     m_bMagInitialized = true;
     return true;
@@ -178,7 +174,7 @@ BOOL ScreenCapturerMagnifier::OnMagImageScalingCallback(HWND hwnd,
                                                         RECT clipped,
                                                         HRGN dirty)
 {
-    ScreenCapturerMagnifier* owner = reinterpret_cast<ScreenCapturerMagnifier*>(TlsGetValue(m_dwTlsIdx));
+    ScreenCapturerMagnifier* owner = g_Owner;
 
     owner->OnCaptured(srcdata, srcheader);
 

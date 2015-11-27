@@ -38,6 +38,9 @@ protected:
     RECT captureRect;
     DWORD dwFps;
     void SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName);
+    static DWORD WINAPI ThreadedTimer(LPVOID lpParam);
+    HANDLE hTimerThread;
+    DWORD dwTimerThreadId;
 
 public:
     afx_msg void OnDestroy();
