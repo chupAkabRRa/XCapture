@@ -127,7 +127,7 @@ bool ScreenCapturerMagnifier::InitializeMagnifier()
     // Create the magnifier control in host window created above
     m_hMagnifierControlWindow = CreateWindow(kMagnifierWindowClass,
                                              kMagnifierWindowName,
-                                             WS_CHILD | WS_VISIBLE,
+                                             WS_CHILD | WS_VISIBLE | MS_SHOWMAGNIFIEDCURSOR,
                                              0, 0, 0, 0,
                                              m_hHostWindow,
                                              NULL,
