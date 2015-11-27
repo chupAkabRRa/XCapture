@@ -42,6 +42,7 @@ protected:
     HANDLE hTimerThread;
     DWORD dwTimerThreadId;
     CWnd* label;
+    volatile bool bExitThread;
 
 public:
     afx_msg void OnDestroy();

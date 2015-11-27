@@ -20,6 +20,8 @@ DWORD WINAPI CXCaptureDlg::ThreadedTimer(LPVOID lpParam)
     {
         captureDlg->capturer->Capture(captureDlg->captureRect);
     }
+
+    return 0;
 }
 
 // CXCaptureDlg dialog
@@ -61,6 +63,7 @@ BOOL CXCaptureDlg::OnInitDialog()
     capturer = NULL;
     dwFps = 0;
     hTimerThread = NULL;
+    bExitThread = false;
 
     // Get scr resolution
     RECT rect;
@@ -123,8 +126,6 @@ HCURSOR CXCaptureDlg::OnQueryDragIcon()
 
 void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
 {
-    //TRACE(L"PROCESSED!");
-    //SaveBmpToFile(*bmif, pData, L"D:\\test.bmp");
     BITMAPINFO bmi;
     HBITMAP hbmp;
     CDC *pDC = GetDC();
@@ -145,12 +146,15 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
 
 void CXCaptureDlg::OnDestroy()
 {
+    // Terminate timer thread
+    if (hTimerThread) {
+        TerminateThread(hTimerThread, 0);
+        CloseHandle(hTimerThread);
+    }
+
     __super::OnDestroy();
 
     // TODO: Add your message handler code here
-    if (hTimerThread) {
-        CloseHandle(hTimerThread);
-    }
 }
 
 

@@ -183,8 +183,6 @@ BOOL ScreenCapturerMagnifier::OnMagImageScalingCallback(HWND hwnd,
 
 void ScreenCapturerMagnifier::OnCaptured(void* data, const MAGIMAGEHEADER& header)
 {
-    //TRACE(L"CAPTURED!\n");
-
     // Setup the bitmap info header
     m_bmif.biSize = sizeof(BITMAPINFOHEADER);
     m_bmif.biHeight = header.height;
