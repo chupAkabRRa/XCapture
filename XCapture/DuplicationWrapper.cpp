@@ -313,8 +313,8 @@ HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
     WICRect rect;
     rect.X = 0;
     rect.Y = 0;
-    rect.Width = 1024;
-    rect.Height = 768;
+    rect.Width = dwDstWidth;
+    rect.Height = dwDstHeight;
     spBitmap->CopyPixels(&rect, dwDstWidth * 4, dwDstWidth * dwDstHeight * 4, pBits);
 
     return hr;

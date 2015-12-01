@@ -65,7 +65,7 @@ void ScreenCapturerDuplication::Capture(RECT srcRect)
             lineStart++;
             lineEnd--;
         }
-        delete pLineData;
+        delete[] pLineData;
 
         m_Callback->OnCaptureComplete(m_pBuf, &m_bmif);
     }

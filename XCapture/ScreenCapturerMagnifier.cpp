@@ -193,11 +193,11 @@ void ScreenCapturerMagnifier::OnCaptured(void* data, const MAGIMAGEHEADER& heade
     m_bmif.biCompression = BI_RGB;
 
     if (m_pData != NULL) {
-        delete m_pData;
+        delete[] m_pData;
         m_pData = NULL;
     }
 
-    m_pData = (BYTE*)calloc(m_bmif.biSizeImage, sizeof(BYTE));
+    m_pData = new BYTE[m_bmif.biSizeImage];
     memcpy(m_pData, data, m_bmif.biSizeImage);
 
     // The data bit is in top->bottom order, so we convert it to bottom->top order
@@ -221,7 +221,7 @@ void ScreenCapturerMagnifier::OnCaptured(void* data, const MAGIMAGEHEADER& heade
         lineStart++;
         lineEnd--;
     }
-    delete pLineData;
+    delete[] pLineData;
 
     m_bCaptureSucceeded = true;
 }
