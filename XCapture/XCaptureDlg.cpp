@@ -7,6 +7,7 @@
 #include "XCaptureDlg.h"
 #include "afxdialogex.h"
 #include "ScreenCapturerMagnifier.h"
+#include "ScreenCapturerDuplication.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -79,7 +80,7 @@ BOOL CXCaptureDlg::OnInitDialog()
     hInstance = AfxGetInstanceHandle();
     label = GetDlgItem(IDC_FPS);
 
-    capturer = std::make_shared<ScreenCapturerMagnifier>();
+    capturer = std::make_shared<ScreenCapturerDuplication>();
     capturer->Start(this);
 
     hTimerThread = CreateThread(NULL, 0, ThreadedTimer, this, 0, &dwTimerThreadId);
@@ -162,7 +163,8 @@ void CXCaptureDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
     // Get the screen rectangle
-    capturer->SetExcludedWindow(this->GetSafeHwnd());
+    //capturer->SetExcludedWindow(this->GetSafeHwnd());
+    capturer->Capture(captureRect);
 }
 
 void CXCaptureDlg::SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName)

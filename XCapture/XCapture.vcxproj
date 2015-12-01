@@ -99,8 +99,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DuplicationWrapper.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ScreenCapturer.h" />
+    <ClInclude Include="ScreenCapturerDuplication.h" />
     <ClInclude Include="ScreenCapturerMagnifier.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -108,6 +110,8 @@
     <ClInclude Include="XCaptureDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DuplicationWrapper.cpp" />
+    <ClCompile Include="ScreenCapturerDuplication.cpp" />
     <ClCompile Include="ScreenCapturerMagnifier.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
