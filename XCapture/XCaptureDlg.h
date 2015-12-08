@@ -12,7 +12,7 @@ class IXCaptureThread
 public:
     std::unique_ptr<ScreenCapturer> capturer;
     RECT captureRect;
-    DWORD dwTimerThreadId;
+    DWORD dwCaptureThreadId;
     HANDLE hTerminateThreadEvent;
 };
 
@@ -48,8 +48,8 @@ protected:
     HINSTANCE hInstance;
     
     DWORD dwFps;
-    static DWORD WINAPI ThreadedTimer(LPVOID lpParam);
-    HANDLE hTimerThread;
+    static DWORD WINAPI CaptureThreadFunc(LPVOID lpParam);
+    HANDLE hCaptureThread;
 
 public:
     afx_msg void OnDestroy();

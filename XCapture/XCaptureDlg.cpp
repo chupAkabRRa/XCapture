@@ -13,13 +13,13 @@
 #define new DEBUG_NEW
 #endif
 
-DWORD WINAPI CXCaptureDlg::ThreadedTimer(LPVOID lpParam)
+DWORD WINAPI CXCaptureDlg::CaptureThreadFunc(LPVOID lpParam)
 {
-    IXCaptureThread* captureDlg = (IXCaptureThread*)lpParam;
+    IXCaptureThread* captureThread = (IXCaptureThread*)lpParam;
 
-    while ((WaitForSingleObjectEx(captureDlg->hTerminateThreadEvent, 0, FALSE) == WAIT_TIMEOUT))
+    while ((WaitForSingleObjectEx(captureThread->hTerminateThreadEvent, 0, FALSE) == WAIT_TIMEOUT))
     {
-        captureDlg->capturer->Capture(captureDlg->captureRect);
+        captureThread->capturer->Capture(captureThread->captureRect);
     }
 
     return 0;
@@ -60,7 +60,7 @@ BOOL CXCaptureDlg::OnInitDialog()
 	// TODO: Add extra initialization here
     capturer = NULL;
     dwFps = 0;
-    hTimerThread = NULL;
+    hCaptureThread = NULL;
 
     // Get scr resolution
     RECT rect;
@@ -82,7 +82,7 @@ BOOL CXCaptureDlg::OnInitDialog()
     SetWindowText(L"FPS: 0");
 
     hTerminateThreadEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-    hTimerThread = CreateThread(NULL, 0, ThreadedTimer, (IXCaptureThread*)this, 0, &dwTimerThreadId);
+    hCaptureThread = CreateThread(NULL, 0, CaptureThreadFunc, (IXCaptureThread*)this, 0, &dwCaptureThreadId);
     SetTimer(100, 1000, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -148,10 +148,10 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
 void CXCaptureDlg::OnDestroy()
 {
     // Terminate timer thread
-    if (hTimerThread) {
+    if (hCaptureThread) {
         SetEvent(hTerminateThreadEvent);
-        WaitForSingleObject(hTimerThread, INFINITE);
-        CloseHandle(hTimerThread);
+        WaitForSingleObject(hCaptureThread, INFINITE);
+        CloseHandle(hCaptureThread);
     }
 
     CloseHandle(hTerminateThreadEvent);
