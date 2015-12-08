@@ -53,8 +53,6 @@ END_MESSAGE_MAP()
 
 BOOL CXCaptureDlg::OnInitDialog()
 {
-    CoInitialize(NULL);
-
 	CDialogEx::OnInitDialog();
 
 	// Set the icon for this dialog.  The framework does this automatically
@@ -155,8 +153,6 @@ void CXCaptureDlg::OnDestroy()
         TerminateThread(hTimerThread, 0);
         CloseHandle(hTimerThread);
     }
-
-    CoUninitialize();
 
     __super::OnDestroy();
 
