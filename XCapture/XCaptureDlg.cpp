@@ -15,9 +15,9 @@
 
 DWORD WINAPI CXCaptureDlg::ThreadedTimer(LPVOID lpParam)
 {
-    CXCaptureDlg* captureDlg = (CXCaptureDlg*)lpParam;
+    IXCaptureThread* captureDlg = (IXCaptureThread*)lpParam;
 
-    while (TRUE)
+    while ((WaitForSingleObjectEx(captureDlg->hTerminateThreadEvent, 0, FALSE) == WAIT_TIMEOUT))
     {
         captureDlg->capturer->Capture(captureDlg->captureRect);
     }
@@ -77,13 +77,14 @@ BOOL CXCaptureDlg::OnInitDialog()
 
     hInstance = AfxGetInstanceHandle();
 
-    capturer = std::make_shared<ScreenCapturerDuplication>();
+    capturer = std::make_unique<ScreenCapturerDuplication>();
     capturer->Start(this);
 
     // Show FPS in caption
     SetWindowText(L"FPS: 0");
 
-    hTimerThread = CreateThread(NULL, 0, ThreadedTimer, this, 0, &dwTimerThreadId);
+    hTerminateThreadEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    hTimerThread = CreateThread(NULL, 0, ThreadedTimer, (IXCaptureThread*)this, 0, &dwTimerThreadId);
     SetTimer(100, 1000, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -150,9 +151,12 @@ void CXCaptureDlg::OnDestroy()
 {
     // Terminate timer thread
     if (hTimerThread) {
-        TerminateThread(hTimerThread, 0);
+        SetEvent(hTerminateThreadEvent);
+        WaitForSingleObject(hTimerThread, INFINITE);
         CloseHandle(hTimerThread);
     }
+
+    CloseHandle(hTerminateThreadEvent);
 
     __super::OnDestroy();
 

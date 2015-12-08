@@ -7,8 +7,20 @@
 #include "ScreenCapturer.h"
 #include <memory>
 
+class IXCaptureThread
+{
+public:
+    std::unique_ptr<ScreenCapturer> capturer;
+    RECT captureRect;
+    DWORD dwTimerThreadId;
+    HANDLE hTerminateThreadEvent;
+};
+
 // CXCaptureDlg dialog
-class CXCaptureDlg : public CDialogEx, public ScreenCapturer::Callback
+class CXCaptureDlg 
+    : public CDialogEx
+    , public ScreenCapturer::Callback
+    , public IXCaptureThread
 {
 // Construction
 public:
@@ -34,13 +46,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
     HINSTANCE hInstance;
-    std::shared_ptr<ScreenCapturer> capturer;
-    RECT captureRect;
+    
     DWORD dwFps;
     static DWORD WINAPI ThreadedTimer(LPVOID lpParam);
     HANDLE hTimerThread;
-    DWORD dwTimerThreadId;
-    volatile bool bExitThread;
 
 public:
     afx_msg void OnDestroy();
