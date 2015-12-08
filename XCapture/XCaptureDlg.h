@@ -37,16 +37,12 @@ protected:
     std::shared_ptr<ScreenCapturer> capturer;
     RECT captureRect;
     DWORD dwFps;
-    void SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName);
     static DWORD WINAPI ThreadedTimer(LPVOID lpParam);
     HANDLE hTimerThread;
     DWORD dwTimerThreadId;
-    CWnd* label;
     volatile bool bExitThread;
 
 public:
     afx_msg void OnDestroy();
-    afx_msg void OnBnClickedOk();
-    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

@@ -43,8 +43,6 @@ BEGIN_MESSAGE_MAP(CXCaptureDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
     ON_WM_DESTROY()
-    ON_BN_CLICKED(IDOK, &CXCaptureDlg::OnBnClickedOk)
-    ON_WM_ERASEBKGND()
     ON_WM_TIMER()
 END_MESSAGE_MAP()
 
@@ -78,10 +76,12 @@ BOOL CXCaptureDlg::OnInitDialog()
     captureRect.bottom = 768;
 
     hInstance = AfxGetInstanceHandle();
-    label = GetDlgItem(IDC_FPS);
 
     capturer = std::make_shared<ScreenCapturerDuplication>();
     capturer->Start(this);
+
+    // Show FPS in caption
+    SetWindowText(L"FPS: 0");
 
     hTimerThread = CreateThread(NULL, 0, ThreadedTimer, this, 0, &dwTimerThreadId);
     SetTimer(100, 1000, NULL);
@@ -159,59 +159,13 @@ void CXCaptureDlg::OnDestroy()
     // TODO: Add your message handler code here
 }
 
-
-void CXCaptureDlg::OnBnClickedOk()
-{
-    // TODO: Add your control notification handler code here
-    // Get the screen rectangle
-    //capturer->SetExcludedWindow(this->GetSafeHwnd());
-    capturer->Capture(captureRect);
-}
-
-void CXCaptureDlg::SaveBmpToFile(BITMAPINFOHEADER& bmif, BYTE *pData, CString fileName)
-{
-    // File open
-    CFile pFile;
-    if (!pFile.Open((LPCTSTR)fileName, CFile::modeCreate | CFile::modeWrite))
-    {
-        return;
-    }
-
-    // Setup the bitmap file header
-    BITMAPFILEHEADER bmfh;
-    LONG offBits = sizeof(BITMAPFILEHEADER) + bmif.biSize;
-    bmfh.bfType = 0x4d42; // "BM"
-    bmfh.bfOffBits = offBits;
-    bmfh.bfSize = offBits + bmif.biSizeImage;
-    bmfh.bfReserved1 = 0;
-    bmfh.bfReserved2 = 0;
-
-    //Write data to file
-    pFile.Write(&bmfh, sizeof(BITMAPFILEHEADER)); // bitmap file header
-    pFile.Write(&bmif, sizeof(BITMAPINFOHEADER)); // bitmap info header
-    pFile.Write(pData, bmif.biSizeImage); // converted bitmap data
-
-    // File close
-    pFile.Close();
-}
-
-
-BOOL CXCaptureDlg::OnEraseBkgnd(CDC* pDC)
-{
-    // TODO: Add your message handler code here and/or call default
-
-    return __super::OnEraseBkgnd(pDC);
-}
-
-
 void CXCaptureDlg::OnTimer(UINT_PTR nIDEvent)
 {
     // TODO: Add your message handler code here and/or call default
     if (nIDEvent == 100) {
-        WCHAR str[5];
-        swprintf_s(str, 3, L"%d", dwFps);
-        label->SetWindowTextW(str);
-        UpdateData(FALSE);
+        WCHAR str[10] = {0};
+        swprintf_s(str, 10, L"FPS: %d", dwFps);
+        SetWindowText(str);
         dwFps = 0;
     }
 
