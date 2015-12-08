@@ -9,7 +9,10 @@ ScreenCapturerDuplication::ScreenCapturerDuplication()
 
 ScreenCapturerDuplication::~ScreenCapturerDuplication()
 {
-
+    if (m_pBuf) {
+        delete[] m_pBuf;
+        m_pBuf = nullptr;
+    }
 }
 
 void ScreenCapturerDuplication::Start(Callback* callback)

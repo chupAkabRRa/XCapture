@@ -142,6 +142,7 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
     BitBlt(*pDC, 0, 0, bmi.bmiHeader.biWidth, bmi.bmiHeader.biHeight, hdcMem, 0, 0, SRCCOPY);
     SelectObject(hdcMem, hbmOld);
     DeleteDC(hdcMem);
+    DeleteObject(hbmp);
     ReleaseDC(pDC);
     
     dwFps++;

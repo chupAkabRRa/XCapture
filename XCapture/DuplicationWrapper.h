@@ -13,6 +13,7 @@ class DuplicationOutput
 {
 public:
     DuplicationOutput(IDXGIAdapter1* pAdapter, ID3D11Device* pDevice, ID3D11DeviceContext *pContext, IDXGIOutput1* pOutput, IDXGIOutputDuplication *pDuplication);
+    ~DuplicationOutput();
 
     HRESULT GetDesc(DXGI_OUTPUT_DESC& desc);
     HRESULT AcquireNextFrame(IDXGISurface1** pDXGISurface);

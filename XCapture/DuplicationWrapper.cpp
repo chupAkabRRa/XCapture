@@ -18,6 +18,11 @@ DuplicationOutput::DuplicationOutput(IDXGIAdapter1* pAdapter, ID3D11Device* pDev
     , m_OutputDuplication(pDuplication)
 {}
 
+DuplicationOutput::~DuplicationOutput()
+{
+    m_OutputDuplication->ReleaseFrame();
+}
+
 HRESULT DuplicationOutput::GetDesc(DXGI_OUTPUT_DESC& desc)
 {
     m_Output->GetDesc(&desc);
