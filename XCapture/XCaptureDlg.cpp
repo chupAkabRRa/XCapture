@@ -27,7 +27,6 @@ DWORD WINAPI CXCaptureDlg::ThreadedTimer(LPVOID lpParam)
 
 // CXCaptureDlg dialog
 
-
 CXCaptureDlg::CXCaptureDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CXCaptureDlg::IDD, pParent)
 {
@@ -62,7 +61,6 @@ BOOL CXCaptureDlg::OnInitDialog()
     capturer = NULL;
     dwFps = 0;
     hTimerThread = NULL;
-    bExitThread = false;
 
     // Get scr resolution
     RECT rect;
