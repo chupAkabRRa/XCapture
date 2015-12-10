@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(CXCaptureDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
     ON_WM_DESTROY()
     ON_WM_TIMER()
+    ON_BN_CLICKED(IDC_BUTTON_EXIT, &CXCaptureDlg::OnBnClickedButtonExit)
 END_MESSAGE_MAP()
 
 
@@ -75,7 +76,7 @@ BOOL CXCaptureDlg::OnInitDialog()
 
     hInstance = AfxGetInstanceHandle();
 
-    capturer = std::make_unique<ScreenCapturerDuplication>();
+    capturer = std::make_unique<ScreenCapturerMagnifier>();
     capturer->Start(this);
 
     // Show FPS in caption
@@ -147,15 +148,6 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
 
 void CXCaptureDlg::OnDestroy()
 {
-    // Terminate timer thread
-    if (hCaptureThread) {
-        SetEvent(hTerminateThreadEvent);
-        WaitForSingleObject(hCaptureThread, INFINITE);
-        CloseHandle(hCaptureThread);
-    }
-
-    CloseHandle(hTerminateThreadEvent);
-
     __super::OnDestroy();
 
     // TODO: Add your message handler code here
@@ -172,4 +164,36 @@ void CXCaptureDlg::OnTimer(UINT_PTR nIDEvent)
     }
 
     __super::OnTimer(nIDEvent);
+}
+
+void CXCaptureDlg::StopCaptureThread()
+{
+    // Terminate timer thread
+    if (hCaptureThread) {
+        SetEvent(hTerminateThreadEvent);
+        WaitForSingleObject(hCaptureThread, INFINITE);
+        CloseHandle(hCaptureThread);
+        hCaptureThread = NULL;
+    }
+
+    CloseHandle(hTerminateThreadEvent);
+    hTerminateThreadEvent = NULL;
+}
+
+void CXCaptureDlg::OnCancel()
+{
+    StopCaptureThread();
+    __super::OnCancel();
+}
+
+void CXCaptureDlg::OnOK()
+{
+    StopCaptureThread();
+    __super::OnOK();
+}
+
+void CXCaptureDlg::OnBnClickedButtonExit()
+{
+    StopCaptureThread();
+    DestroyWindow();
 }

@@ -49,9 +49,13 @@ protected:
     
     DWORD dwFps;
     static DWORD WINAPI CaptureThreadFunc(LPVOID lpParam);
+    void StopCaptureThread();
     HANDLE hCaptureThread;
 
 public:
     afx_msg void OnDestroy();
     afx_msg void OnTimer(UINT_PTR nIDEvent);
+    afx_msg void OnBnClickedButtonExit();
+    virtual void OnCancel();
+    virtual void OnOK();
 };
