@@ -200,29 +200,6 @@ void ScreenCapturerMagnifier::OnCaptured(void* data, const MAGIMAGEHEADER& heade
     m_pData = new BYTE[m_bmif.biSizeImage];
     memcpy(m_pData, data, m_bmif.biSizeImage);
 
-    // The data bit is in top->bottom order, so we convert it to bottom->top order
-    LONG lineSize = m_bmif.biWidth * m_bmif.biBitCount / 8;
-    BYTE* pLineData = new BYTE[lineSize];
-    BYTE* pStart;
-    BYTE* pEnd;
-    LONG lineStart = 0;
-    LONG lineEnd = m_bmif.biHeight - 1;
-    while (lineStart < lineEnd)
-    {
-        // Get the address of the swap line
-        pStart = m_pData + (lineStart * lineSize);
-        pEnd = m_pData + (lineEnd * lineSize);
-        // Swap the top with the bottom
-        memcpy(pLineData, pStart, lineSize);
-        memcpy(pStart, pEnd, lineSize);
-        memcpy(pEnd, pLineData, lineSize);
-
-        // Adjust the line index
-        lineStart++;
-        lineEnd--;
-    }
-    delete[] pLineData;
-
     m_bCaptureSucceeded = true;
 }
 

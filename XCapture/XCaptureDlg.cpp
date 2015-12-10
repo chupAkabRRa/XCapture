@@ -131,6 +131,29 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
     HBITMAP hbmp;
     CDC *pDC = GetDC();
 
+    // The data bit is in top->bottom order, so we convert it to bottom->top order
+    LONG lineSize = bmif->biWidth * bmif->biBitCount / 8;
+    BYTE* pLineData = new BYTE[lineSize];
+    BYTE* pStart;
+    BYTE* pEnd;
+    LONG lineStart = 0;
+    LONG lineEnd = bmif->biHeight - 1;
+    while (lineStart < lineEnd)
+    {
+        // Get the address of the swap line
+        pStart = pData + (lineStart * lineSize);
+        pEnd = pData + (lineEnd * lineSize);
+        // Swap the top with the bottom
+        memcpy(pLineData, pStart, lineSize);
+        memcpy(pStart, pEnd, lineSize);
+        memcpy(pEnd, pLineData, lineSize);
+
+        // Adjust the line index
+        lineStart++;
+        lineEnd--;
+    }
+    delete[] pLineData;
+
     bmi.bmiHeader = *bmif;
     hbmp = CreateDIBitmap(*pDC, bmif, CBM_INIT, pData, &bmi, DIB_RGB_COLORS);
 
