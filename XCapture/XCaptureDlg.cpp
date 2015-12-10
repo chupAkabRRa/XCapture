@@ -149,13 +149,10 @@ void CXCaptureDlg::OnCaptureComplete(BYTE* pData, BITMAPINFOHEADER* bmif)
 void CXCaptureDlg::OnDestroy()
 {
     __super::OnDestroy();
-
-    // TODO: Add your message handler code here
 }
 
 void CXCaptureDlg::OnTimer(UINT_PTR nIDEvent)
 {
-    // TODO: Add your message handler code here and/or call default
     if (nIDEvent == 100) {
         WCHAR str[10] = {0};
         swprintf_s(str, 10, L"FPS: %d", dwFps);
