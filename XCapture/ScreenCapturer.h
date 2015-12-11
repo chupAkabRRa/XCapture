@@ -15,7 +15,7 @@ public:
     virtual ~ScreenCapturer() {}
 
     // Call to start capturing
-    virtual void Start(Callback *callback) = 0;
+    virtual bool Start(Callback* callback) = 0;
 
     virtual void Capture(RECT srcRect) = 0;
 

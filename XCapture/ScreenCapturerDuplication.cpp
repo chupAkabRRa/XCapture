@@ -15,11 +15,11 @@ ScreenCapturerDuplication::~ScreenCapturerDuplication()
     }
 }
 
-void ScreenCapturerDuplication::Start(Callback* callback)
+bool ScreenCapturerDuplication::Start(Callback* callback)
 {
     m_Callback = callback;
 
-    pDuplicationManager->Init();
+    return pDuplicationManager->Init();
 }
 
 void ScreenCapturerDuplication::Capture(RECT srcRect)

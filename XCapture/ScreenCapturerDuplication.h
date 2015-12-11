@@ -11,12 +11,17 @@ public:
     ~ScreenCapturerDuplication();
 
     // ScreenCapturer interface
-    void Start(Callback* callback) override;
+    bool Start(Callback* callback) override;
     void Capture(RECT srcRect) override;
 
 private:
+    // Callback to call when image is received from Magnification API
     Callback* m_Callback;
+
+    // Manages all the stuff related to Duplication API
     std::unique_ptr<DuplicationManager> pDuplicationManager;
-    BYTE *m_pBuf;
+
+    // Data to pass to renderer callback at the end
+    BYTE* m_pBuf;
     BITMAPINFOHEADER m_bmif;
 };

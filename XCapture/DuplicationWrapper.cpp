@@ -40,8 +40,7 @@ HRESULT DuplicationOutput::AcquireNextFrame(IDXGISurface1** pDXGISurface)
     DXGI_OUTDUPL_FRAME_INFO fi;
     CComPtr<IDXGIResource> spDXGIResource;
     HRESULT hr = m_OutputDuplication->AcquireNextFrame(20, &fi, &spDXGIResource);
-    if (FAILED(hr))
-    {
+    if (FAILED(hr)) {
         return hr;
     }
 
@@ -84,7 +83,7 @@ HRESULT DuplicationOutput::AcquireNextFrame(IDXGISurface1** pDXGISurface)
 
 DuplicationManager::DuplicationManager()
     : m_bInitialized(false)
-    , m_pBuf(NULL)
+    , m_pBuf(nullptr)
 {
     SetRect(&m_rcCurrentOutput, 0, 0, 0, 0);
 }
@@ -93,51 +92,46 @@ DuplicationManager::~DuplicationManager()
 {
     Gdiplus::GdiplusShutdown(m_gdiplusToken);
 
-    if (m_pBuf)
-    {
+    if (m_pBuf) {
         delete[] m_pBuf;
-        m_pBuf = NULL;
+        m_pBuf = nullptr;
     }
 }
 
-HRESULT DuplicationManager::Init()
+bool DuplicationManager::Init()
 {
     if (m_bInitialized) {
-        return S_OK;
+        return true;
     }
 
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 
     HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_spDXGIFactory1));
-    if (FAILED(hr))
-    {
-        return hr;
+    if (FAILED(hr)) {
+        TRACE(L"CreateDXGIFactory1 failed with 0x%x", hr);
+        return false;
     }
 
     // Getting all adapters
     std::vector<CComPtr<IDXGIAdapter1>> vAdapters;
 
     CComPtr<IDXGIAdapter1> spAdapter;
-    for (int i = 0; m_spDXGIFactory1->EnumAdapters1(i, &spAdapter) != DXGI_ERROR_NOT_FOUND; i++)
-    {
+    for (int i = 0; m_spDXGIFactory1->EnumAdapters1(i, &spAdapter) != DXGI_ERROR_NOT_FOUND; i++) {
         vAdapters.push_back(spAdapter);
         spAdapter.Release();
     }
 
     // Iterating over all adapters to get all outputs
-    for (auto& AdapterIter : vAdapters)
-    {
+    for (auto& AdapterIter : vAdapters) {
         std::vector<CComPtr<IDXGIOutput>> vOutputs;
 
         CComPtr<IDXGIOutput> spDXGIOutput;
-        for (int i = 0; AdapterIter->EnumOutputs(i, &spDXGIOutput) != DXGI_ERROR_NOT_FOUND; i++)
-        {
+        for (int i = 0; AdapterIter->EnumOutputs(i, &spDXGIOutput) != DXGI_ERROR_NOT_FOUND; i++) {
             DXGI_OUTPUT_DESC outputDesc;
             spDXGIOutput->GetDesc(&outputDesc);
 
-            if (outputDesc.AttachedToDesktop)
-            {
+            if (outputDesc.AttachedToDesktop) {
                 vOutputs.push_back(spDXGIOutput);
             }
 
@@ -152,13 +146,12 @@ HRESULT DuplicationManager::Init()
         CComPtr<ID3D11DeviceContext> spD3D11DeviceContext;
         D3D_FEATURE_LEVEL fl = D3D_FEATURE_LEVEL_9_1;
         hr = D3D11CreateDevice(AdapterIter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, NULL, 0, D3D11_SDK_VERSION, &spD3D11Device, &fl, &spD3D11DeviceContext);
-        if (FAILED(hr))
-        {
-            return hr;
+        if (FAILED(hr)) {
+            TRACE(L"D3D11CreateDevice failed with 0x%x", hr);
+            return false;
         }
 
-        for (auto& OutputIter : vOutputs)
-        {
+        for (auto& OutputIter : vOutputs) {
             CComQIPtr<IDXGIOutput1> spDXGIOutput1 = OutputIter;
             CComQIPtr<IDXGIDevice1> spDXGIDevice = spD3D11Device;
             if (!spDXGIOutput1 || !spDXGIDevice)
@@ -188,17 +181,16 @@ HRESULT DuplicationManager::Init()
     }
 
     hr = m_spWICFactory.CoCreateInstance(CLSID_WICImagingFactory);
-    if (FAILED(hr))
-    {
-        return hr;
+    if (FAILED(hr)) {
+        TRACE(L"Creation of CLSID_WICImagingFactory failed with 0x%x", hr);
+        return false;
     }
 
     m_bInitialized = true;
-
-    return S_OK;
+    return true;
 }
 
-HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
+bool DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
 {
     HRESULT hr = S_OK;
 
@@ -209,7 +201,8 @@ HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
     DXGI_OUTPUT_DESC outDesc;
     hr = m_Output->GetDesc(outDesc);
     if (FAILED(hr)) {
-        return hr;
+        TRACE(L"GetDesc failed with 0x%x", hr);
+        return false;
     }
 
     rcOutput = outDesc.DesktopCoordinates;
@@ -217,14 +210,12 @@ HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
     DWORD dwOutputWidth = rcOutput.right - rcOutput.left;
     DWORD dwOutputHeight = rcOutput.bottom - rcOutput.top;
 
-    if (!m_pBuf || !EqualRect(&m_rcCurrentOutput, &rcOutput))
-    {
+    if (!m_pBuf || !EqualRect(&m_rcCurrentOutput, &rcOutput)) {
         DWORD dwBufSize = dwOutputWidth*dwOutputHeight * 4;
 
-        if (m_pBuf)
-        {
+        if (m_pBuf) {
             delete[] m_pBuf;
-            m_pBuf = NULL;
+            m_pBuf = nullptr;
         }
 
         m_pBuf = new BYTE[dwBufSize];
@@ -235,7 +226,8 @@ HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
     CComPtr<IDXGISurface1> spDXGISurface1;
     hr = m_Output->AcquireNextFrame(&spDXGISurface1);
     if (FAILED(hr)) {
-        return hr;
+        TRACE(L"AcquireNextFrame failed with 0x%x", hr);
+        return false;
     }
 
     DXGI_MAPPED_RECT map;
@@ -312,7 +304,8 @@ HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
     CComPtr<IWICBitmap> spBitmap = NULL;
     hr = m_spWICFactory->CreateBitmapFromMemory(dwOutputWidth, dwOutputHeight, GUID_WICPixelFormat32bppBGRA, dwOutputWidth * 4, dwOutputWidth*dwOutputHeight * 4, (BYTE*)m_pBuf, &spBitmap);
     if (FAILED(hr)) {
-        return hr;
+        TRACE(L"CreateBitmapFromMemory failed with 0x%x", hr);
+        return false;
     }
 
     WICRect rect;
@@ -322,5 +315,5 @@ HRESULT DuplicationManager::CaptureImage(BYTE* pBits, RECT& rcDest)
     rect.Height = dwDstHeight;
     spBitmap->CopyPixels(&rect, dwDstWidth * 4, dwDstWidth * dwDstHeight * 4, pBits);
 
-    return hr;
+    return true;
 }

@@ -76,8 +76,10 @@ BOOL CXCaptureDlg::OnInitDialog()
 
     hInstance = AfxGetInstanceHandle();
 
-    capturer = std::make_unique<ScreenCapturerMagnifier>();
-    capturer->Start(this);
+    capturer = std::make_unique<ScreenCapturerDuplication>();
+    if (!capturer->Start(this)) {
+        return FALSE;
+    }
 
     // Show FPS in caption
     SetWindowText(L"FPS: 0");

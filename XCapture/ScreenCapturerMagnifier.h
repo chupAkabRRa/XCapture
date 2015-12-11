@@ -13,7 +13,7 @@ public:
     virtual ~ScreenCapturerMagnifier();
 
     // ScreenCapturer interface
-    void Start(Callback *callback) override;
+    bool Start(Callback* callback) override;
     void Capture(RECT srcRect) override;
     void SetExcludedWindow(HWND hWindow) override;
 
@@ -55,10 +55,9 @@ private:
     bool CaptureImage(RECT srcRect);
 
     bool m_bMagInitialized;
-    static DWORD m_dwTlsIdx;
 
     // Callback to call when image is received from Magnification API
-    Callback   *m_Callback;
+    Callback* m_Callback;
 
     // Import from Magnification lib
     HMODULE                         m_hMagLib;
@@ -70,16 +69,17 @@ private:
 
     // Hidden host window
     HWND m_hHostWindow;
+
     // Magnifier control
     HWND m_hMagnifierControlWindow;
-    // App instance
-    HINSTANCE m_hInst;
+
     // Window to exclude
     // (May be changed to list of excluded windows in future)
     HWND m_hExcludedWindow;
 
     bool m_bCaptureSucceeded;
 
+    // Data to pass to renderer callback at the end
     BYTE* m_pData;
     BITMAPINFOHEADER m_bmif;
 };

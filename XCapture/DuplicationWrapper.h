@@ -33,15 +33,24 @@ public:
     DuplicationManager();
     ~DuplicationManager();
 
-    HRESULT CaptureImage(BYTE* pBuf, RECT& rcDest);
-    HRESULT Init();
+    bool CaptureImage(BYTE* pBuf, RECT& rcDest);
+    bool Init();
 
 private:
     bool m_bInitialized;
+
+    // Manages all low-level stuff to capture image with Duplication API
     std::unique_ptr<DuplicationOutput> m_Output;
+
+    // Used to enumerate endpoints
     CComPtr<IDXGIFactory1> m_spDXGIFactory1;
+
     ULONG_PTR m_gdiplusToken;
+
+    // Stores actual frame
     BYTE* m_pBuf;
     RECT m_rcCurrentOutput;
+
+    // Used to convert texture image to bitmap
     CComPtr<IWICImagingFactory> m_spWICFactory;
 };

@@ -18,7 +18,6 @@ ScreenCapturerMagnifier::ScreenCapturerMagnifier()
     , m_MagSetWindowFilterListFunc(NULL)
     , m_MagSetImageScalingCallbackFunc(NULL)
     , m_MagSetWindowSourceFunc(NULL)
-    , m_hInst(NULL)
     , m_hHostWindow(NULL)
     , m_bCaptureSucceeded(false)
     , m_pData(NULL)
@@ -39,25 +38,29 @@ ScreenCapturerMagnifier::~ScreenCapturerMagnifier()
     }
 
     if (m_pData) {
-        delete m_pData;
+        delete[] m_pData;
     }
 }
 
-void ScreenCapturerMagnifier::Start(Callback *callback)
+bool ScreenCapturerMagnifier::Start(Callback* callback)
 {
     m_Callback = callback;
 
-    InitializeMagnifier();
+    return InitializeMagnifier();
 }
 
 void ScreenCapturerMagnifier::Capture(RECT srcRect)
 {
-    bool result = CaptureImage(srcRect);
+    if (m_bMagInitialized) {
+        bool result = CaptureImage(srcRect);
 
-    if (result)
-        m_Callback->OnCaptureComplete(m_pData, &m_bmif);
-    else
-        m_Callback->OnCaptureComplete(nullptr, nullptr);
+        if (result) {
+            m_Callback->OnCaptureComplete(m_pData, &m_bmif);
+            return;
+        }
+    }
+
+    m_Callback->OnCaptureComplete(nullptr, nullptr);
 }
 
 bool ScreenCapturerMagnifier::InitializeMagnifier()
@@ -133,7 +136,7 @@ bool ScreenCapturerMagnifier::InitializeMagnifier()
                                              0, 0, 0, 0,
                                              m_hHostWindow,
                                              NULL,
-                                             m_hInst,
+                                             NULL,
                                              NULL);
     if (!m_hMagnifierControlWindow) {
         m_MagUninitializeFunc();
