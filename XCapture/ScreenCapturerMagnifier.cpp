@@ -56,6 +56,8 @@ void ScreenCapturerMagnifier::Capture(RECT srcRect)
 
     if (result)
         m_Callback->OnCaptureComplete(m_pData, &m_bmif);
+    else
+        m_Callback->OnCaptureComplete(nullptr, nullptr);
 }
 
 bool ScreenCapturerMagnifier::InitializeMagnifier()

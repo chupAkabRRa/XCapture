@@ -48,6 +48,9 @@ void ScreenCapturerDuplication::Capture(RECT srcRect)
         m_bmif.biCompression = BI_RGB;
 
         m_Callback->OnCaptureComplete(m_pBuf, &m_bmif);
+    } else {
+        // Send NULL in case of error not to crush the whole application
+        m_Callback->OnCaptureComplete(nullptr, nullptr);
     }
 }
 
