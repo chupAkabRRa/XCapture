@@ -1,0 +1,35 @@
+Experimental project to test different API provided by Microsoft to capture
+screen. 
+
+IMPORTANT! 
+Code was written just in test purposes (quick and dirty)
+and hardly can be used in production software (only after couple of 
+modifications)! 
+
+The basic idea for all the methods is:
+1) Inherit the base class (ScreenCapturer) for capturer and override 2 main 
+   methods:
+	- Start: 
+		a) all initialization happens here;
+		b) input parameter - callback which should be called to pass data
+		   to rendere.
+	- Capture:
+		a) screen capturing happens here;
+		b) callback should be called here to pass data to renderer.
+2) Inherit callback interface (ScreenCapturer::Callback) for renderer and
+   render data, received through callback, somehow (currently it's just 
+   straightforward silly BitBlt implementation). Some important info:
+    - Data is passed in bitmap format;
+    - Data is passed in top->bottom order (so it's renderer responsibility to
+      rotate it).
+
+At the moment two capturers were implemented, based on:
+1) Magnification API;
+2) Desktop Duplication API;
+(GDI capturer in TODO list).
+To switch between them just change the type of capturer in CXCaptureDlg, i.e.
+change the type of unique_ptr like std::make_unique<ScreenCapturerDuplication>
+or std::make_unique<ScreenCapturerMagnifier>.
+
+Synchronization between capturer and rendere is silly (it's all synchronous:) ).
+Creting of some king of asynchronous queue is in TODO list too.
